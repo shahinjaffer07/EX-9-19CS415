@@ -1,10 +1,9 @@
-# EX-NO-9-RSA-Algorithm
+## EX-NO-9-RSA-Algorithm
 
 ## AIM:
 To Implement RSA Encryption Algorithm in Cryptography
 
 ## Algorithm:
-
 
 Step 1: Design of RSA Algorithm  
 The RSA algorithm is based on the mathematical difficulty of factoring the product of two large prime numbers. It involves generating a public and private key pair, where the public key is used for encryption, and the private key is used for decryption.
@@ -36,113 +35,52 @@ Step 5: **Security Foundation
 The security of RSA relies on the difficulty of factoring large numbers; thus, choosing sufficiently large prime numbers for \( p \) and \( q \) is crucial for security.
 
 ## Program:
-~~~
+
+```
 #include <stdio.h>
+#include <stdlib.h>
 
-// Function to calculate greatest common divisor (GCD) 
-int gcd(int a, int b) {
-    while (b != 0) {
-        int temp = b;
-        b = a % b;
-        a = temp;
-    }
-    return a;
+long long gcd(long long a,long long b){ while(b){ long long t=b; b=a%b; a=t;} return a; }
+
+long long modexp(long long a,long long e,long long m){
+    long long r=1; a%=m;
+    while(e){ if(e&1) r=(r*a)%m; a=(a*a)%m; e>>=1; }
+    return r;
 }
 
-// Function to calculate (base^exp) % mod using modular exponentiation 
-int mod_exp(int base, int exp, int mod) {
-    int result = 1;
-    base = base % mod;
-
-    while (exp > 0) {
-        if (exp % 2 == 1) {
-            result = (result * base) % mod;
-        }
-        exp = exp >> 1; // exp = exp / 2
-        base = (base * base) % mod;
+long long modinv(long long a,long long m){
+    long long t=0, nt=1, r=m, nr=a;
+    while(nr){
+        long long q = r / nr;
+        long long tmp = nt; nt = t - q*nt; t = tmp;
+        tmp = nr; nr = r - q*nr; r = tmp;
     }
-    return result;
-}
-
-// Function to find the modular inverse using Extended Euclidean Algorithm
-int mod_inverse(int e, int phi_n) {
-    int t = 0, new_t = 1;
-    int r = phi_n, new_r = e;
-
-    while (new_r != 0) {
-        int quotient = r / new_r;
-
-        int temp_t = t;
-        t = new_t;
-        new_t = temp_t - quotient * new_t;
-
-        int temp_r = r;
-        r = new_r;
-        new_r = temp_r - quotient * new_r;
-    }
-
-    if (r > 1) return -1; // No inverse
-    if (t < 0) t += phi_n;
+    if(r>1) return -1;
+    if(t<0) t += m;
     return t;
 }
 
-int main() {
-    int p, q, n, phi_n, e, d;
-    int message, encrypted_message, decrypted_message;
-
-    printf("\n***** Simulation of RSA Encryption and Decryption *****\n\n");
-
-    // Get two prime numbers from the user 
-    printf("Enter a prime number (p): ");
-    scanf("%d", &p);
-    
-    printf("Enter another prime number (q): ");
-    scanf("%d", &q);
-
-    // Calculate n and phi(n) 
-    n = p * q;
-    phi_n = (p - 1) * (q - 1);
-
-    // Choose the public key exponent e such that 1 < e < phi_n and gcd(e, phi_n) = 1
-    do {
-        printf("Enter a value for public key exponent (e) such that 1 < e < %d: ", phi_n);
-        scanf("%d", &e);
-    } while (e <= 1 || e >= phi_n || gcd(e, phi_n) != 1);
-
-    // Calculate the private key exponent d (modular inverse of e)
-    d = mod_inverse(e, phi_n);
-
-    if (d == -1) {
-        printf("Modular inverse does not exist for the given 'e'. Exiting.\n");
-        return 1;
-    }
-
-    printf("Public key: (n = %d, e = %d)\n", n, e);
-    printf("Private key: (n = %d, d = %d)\n", n, d);
-
-    // Get the message to encrypt
-    printf("Enter the message to encrypt (as an integer): ");
-    scanf("%d", &message);
-
-    // Encrypt the message:
-    int ciphertext = mod_exp(message, e, n);
-    encrypted_message = ciphertext;
-    printf("Encrypted message: %d\n", encrypted_message);
-
-    // Decrypt the message:
-    decrypted_message = mod_exp(encrypted_message, d, n);
-    printf("Decrypted message: %d\n", decrypted_message);
-
+int main(void){
+    long long p,q,n,phi,e,d,m,enc,dec;
+    printf("p: "); if(scanf("%lld",&p)!=1) return 0;
+    printf("q: "); if(scanf("%lld",&q)!=1) return 0;
+    n = p*q; phi = (p-1)*(q-1);
+    do{ printf("e (coprime with %lld): ", phi); if(scanf("%lld",&e)!=1) return 0; } while(gcd(e,phi)!=1);
+    d = modinv(e,phi);
+    if(d<0){ puts("No modular inverse for e."); return 1; }
+    printf("Public: (n=%lld,e=%lld)\nPrivate:(n=%lld,d=%lld)\n", n,e,n,d);
+    printf("message (int < n): "); if(scanf("%lld",&m)!=1) return 0;
+    enc = modexp(m,e,n);
+    dec = modexp(enc,d,n);
+    printf("encrypted: %lld\ndecrypted: %lld\n", enc, dec);
     return 0;
 }
-~~~
 
-
+```
 
 ## Output:
 
-<img width="1689" height="780" alt="Screenshot (6)" src="https://github.com/user-attachments/assets/fbaa2f66-9082-4327-a4f7-c08121bae817" />
-
+<img width="725" height="353" alt="Screenshot 2025-11-18 201633" src="https://github.com/user-attachments/assets/37f19500-5b07-4a9b-860b-3ac3cbf08b64" />
 
 ## Result:
  The program is executed successfully.
